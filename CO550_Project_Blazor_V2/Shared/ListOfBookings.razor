@@ -1,0 +1,102 @@
+﻿@using CO550_Project_Blazor_V2.Models
+@using CO550_Project_Blazor_V2.Models.Services
+@using Microsoft.Data.SqlClient;
+
+@foreach(FilmBooking booking in Bookings)
+{
+	<FilmBookingView Booking="@booking"></FilmBookingView>
+}
+
+
+
+	@foreach (string FT in TicketBookingService.FilmTitles)
+	{
+        <div style="text-align:center">
+		<div class="card" style="width: 228px; text-align:center;">
+			<div class="card-body" style="outline: 28px">
+				<svg xmlns="http://www.w3.org/2000/svg" width="57" height="81" fill="currentColor" class="bi bi-ticket-perforated-fill" viewBox="0 0 16 16">
+					<path d="M0 4.5A1.5 1.5 0 0 1 1.5 3h13A1.5 1.5 0 0 1 16 4.5V6a.5.5 0 0 1-.5.5 1.5 1.5 0 0 0 0 3 .5.5 0 0 1 .5.5v1.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 11.5V10a.5.5 0 0 1 .5-.5 1.5 1.5 0 1 0 0-3A.5.5 0 0 1 0 6V4.5Zm4-1v1h1v-1H4Zm1 3v-1H4v1h1Zm7 0v-1h-1v1h1Zm-1-2h1v-1h-1v1Zm-6 3H4v1h1v-1Zm7 1v-1h-1v1h1Zm-7 1H4v1h1v-1Zm7 1v-1h-1v1h1Zm-8 1v1h1v-1H4Zm7 1h1v-1h-1v1Z" />
+				</svg>
+				<p style="font-weight: 800">Title:</p>
+				<p style="font-size:28px;">@FT</p>
+				<button @onclick="()=> TBS.CancelBooking(address.Title)">Cancel Booking</button>
+			</div>
+		</div>
+        </div>
+		<br>
+	}
+
+
+
+
+
+
+@code {
+    [EditorRequired]
+    [Parameter]
+    public List<FilmBooking> Bookings { get; set; } = TicketBookingService.SelectedItems.ToList();
+
+
+    FilmService FService = new FilmService();
+
+    TicketBookingService TBS = new TicketBookingService();
+
+    FilmBooking booking = new FilmBooking();
+
+    SqlCommand com = new SqlCommand();
+
+    List<FilmBooking> SelectedItems = new List<FilmBooking>();
+
+    SqlDataReader dr;
+
+    SqlConnection con = new SqlConnection();
+
+    DatabaseAddress address = new DatabaseAddress();
+
+    public List<DatabaseAddress> DBaddresses = new List<DatabaseAddress>();
+
+    void GetMovieData()
+    {
+        if (DBaddresses.Count > 0)
+        {
+            DBaddresses.Clear();
+        }
+
+        con.ConnectionString = CO550_Project_Blazor_V2.Properties.Resources.ConnectionString;
+
+        try
+        {
+            con.Open();
+
+            com.Connection = con;
+
+            com.CommandText = "SELECT TOP (1000) [FilmID]\r\n      ,[Title]\r\n      ,[ReleaseDate]\r\n      ,[Duration]\r\n      ,[Price]\r\n      ,[Genre]\r\n      ,[Director]\r\n  FROM [aspnet-C0550_Project_MVC-A9A37BF3-47EF-4C23-83A7-24BDFF23D620].[dbo].[Film]";
+
+            dr = com.ExecuteReader();
+
+            while (dr.Read())
+            {
+                DBaddresses.Add(new DatabaseAddress()
+                    {
+                        FilmID = dr["FilmID"].ToString(),
+                        Title = dr["Title"].ToString(),
+                        ReleaseDate = dr["ReleaseDate"].ToString(),
+                        Director = dr["Director"].ToString(),
+                        Duration = dr["Duration"].ToString(),
+                        Price = dr["Price"].ToString(),
+                        Genre = dr["Genre"].ToString()
+                    });
+            }
+
+            con.Close();
+        }
+        catch (Exception ex)
+        {
+
+            throw ex;
+        }
+    }
+
+    
+           
+}

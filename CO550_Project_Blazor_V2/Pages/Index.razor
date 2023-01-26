@@ -1,0 +1,187 @@
+﻿@using CO550_Project_Blazor_V2.Models.Services 
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using System.Web;
+@page "/"
+@using CO550_Project_Blazor_V2.Models
+
+
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+@{
+    SqlCommand com = new SqlCommand();
+
+    List<FilmBooking> SelectedItems = new List<FilmBooking>();
+
+    SqlDataReader dr;
+
+    SqlConnection con = new SqlConnection();
+
+    List<DatabaseAddress> DBaddresses = new List<DatabaseAddress>();
+
+    DatabaseAddress dbAddress = new DatabaseAddress();
+
+    TicketBookingService TBS = new TicketBookingService();
+
+            if(DBaddresses.Count > 0)
+            {
+                DBaddresses.Clear();
+            }
+
+            con.ConnectionString = CO550_Project_Blazor_V2.Properties.Resources.ConnectionString;
+
+            try
+            {
+                con.Open();
+
+                com.Connection = con;
+
+                com.CommandText = "SELECT TOP (1000) [FilmID]\r\n      ,[Title]\r\n      ,[ReleaseDate]\r\n      ,[Duration]\r\n      ,[Price]\r\n      ,[Genre]\r\n      ,[Director]\r\n  FROM [aspnet-C0550_Project_MVC-A9A37BF3-47EF-4C23-83A7-24BDFF23D620].[dbo].[Film]";
+
+                dr = com.ExecuteReader();
+
+                while(dr.Read())
+                {
+                    DBaddresses.Add(new DatabaseAddress()
+                    {
+                        FilmID = dr["FilmID"].ToString(),
+                        Title = dr["Title"].ToString(),
+                        ReleaseDate = dr["ReleaseDate"].ToString(),
+                        Director = dr["Director"].ToString(),
+                        Duration = dr["Duration"].ToString(),
+                        Price = dr["Price"].ToString(),
+                        Genre = dr["Genre"].ToString()
+                    });
+                }
+
+                con.Close();
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+            
+            foreach(DatabaseAddress address in DBaddresses)
+            {
+    <div style="text-align:center">
+                    <div class="card w-50">
+        
+                    <div class="card-body">
+
+                    <h5 class="card-title" style="font-size:28px;">@address.Title</h5>
+
+                    <p class="card-text">@address.Genre</p>
+
+                    <p class="card-text">Runtime:@address.Duration minutes</p>
+
+                    <p class="card-text">Director:@address.Director</p>
+
+                    <p class="card-text" style="color:blue">£@address.Price</p>
+
+                    <button href="#" class="btn btn-primary" type="button" @onclick="()=> TBS.BookMovie(address)">Book</button>
+                    </div>
+                    </div>
+    </div>
+    <br>
+
+
+    }
+
+    
+	
+     List<DatabaseAddress> FilmsList = DBaddresses.ToList();
+
+
+    void BookTicket(string filmID)
+    {
+
+        if (FilmIsBooked(filmID) is false)
+        {
+            FilmBooking booking = new FilmBooking();
+            var address = DBaddresses.First(address => address.FilmID == filmID);
+            booking.DBAddress = address;
+            booking.PurchasePrice = address.Price;
+            SelectedItems.Add(booking);
+        }
+
+
+    }
+
+    bool FilmIsBooked(string filmID)
+    {
+        DatabaseAddress address = new DatabaseAddress();
+
+        foreach (FilmBooking booking in SelectedItems)
+        {
+            if (address.FilmID == filmID)
+            {
+                booking.Quantity++;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //void BookFilm()
+    //{
+    //    if(TicketBookingService.FilmTitles.Count < 0)
+    //    {
+    //        foreach(DatabaseAddress address in DBaddresses)
+    //        {
+    //            if(address.FilmID == "6")
+    //            {
+    //                TicketBookingService.FilmTitles.Add("Inception");
+    //            }
+    //            else if(address.FilmID == "7")
+    //            {
+    //                TicketBookingService.FilmTitles.Add("The Man From U.N.C.L.E");
+    //            }
+    //            else if (address.FilmID == "10")
+    //            {
+    //                TicketBookingService.FilmTitles.Add("Cloud 9");
+    //            }
+    //            else if (address.FilmID == "11")
+    //            {
+    //                TicketBookingService.FilmTitles.Add("Guardians of the Galaxy");
+    //            }
+    //            else if(address.FilmID == "12")
+    //            {
+    //                TicketBookingService.FilmTitles.Add("Bird Box");
+    //            }
+    //            else if (address.FilmID == "13")
+    //            {
+    //                TicketBookingService.FilmTitles.Add("Iron Man");
+    //            }
+    //            else if (address.FilmID == "14")
+    //            {
+    //                TicketBookingService.FilmTitles.Add("Scarface");
+    //            }
+    //            else if (address.FilmID == "15")
+    //            {
+    //                TicketBookingService.FilmTitles.Add("Top Gun: Maverick");
+    //            }
+    //            else if (address.FilmID == "16")
+    //            {
+    //                TicketBookingService.FilmTitles.Add("Black Adam");
+    //            }
+    //            else if (address.FilmID == "17")
+    //            {
+    //                TicketBookingService.FilmTitles.Add("Jurassic World");
+    //            }
+    //        }
+    //    }
+        
+    //}
+}
+    
+
+    
+
