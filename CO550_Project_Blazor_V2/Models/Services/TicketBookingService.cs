@@ -23,6 +23,8 @@ namespace CO550_Project_Blazor_V2.Models.Services
 
         List<DatabaseAddress> DBaddresses = new List<DatabaseAddress>();
 
+        public bool IsBooked { get; set; }
+
         public void BookTicket(string filmID)
         {
 
@@ -60,8 +62,48 @@ namespace CO550_Project_Blazor_V2.Models.Services
 
         public void CancelBooking(string MovieName)
         {
-            DatabaseAddress address = new DatabaseAddress();
-            FilmTitles.Remove(address.Title);
+           FilmTitles = new List<string>();
+            FilmTitles.Add(MovieName);
+            if(MovieName == "Top Gun: Maverick")
+            {
+                FilmTitles.Remove(MovieName);
+            }
+            else if(MovieName == "Inception")
+            {
+               FilmTitles.Remove("Inception");
+            }
+            else if (MovieName == "Cloud 9")
+            {
+                FilmTitles.Remove("Cloud 9");
+            }
+            else if (MovieName == "The Man from U.N.C.L.E")
+            {
+                FilmTitles.Remove("The Man from U.N.C.L.E");
+            }
+            else if (MovieName == "Guardians of the Galaxy")
+            {
+                FilmTitles.Remove("Guardians of the Galaxy");
+            }
+            else if (MovieName == "Bird Box")
+            {
+                FilmTitles.Remove("Bird Box");
+            }
+            else if (MovieName == "Iron Man")
+            {
+                FilmTitles.Remove("Iron Man");
+            }
+            else if (MovieName == "Scarface")
+            {
+                FilmTitles.Remove("Scarface");
+            }
+            else if (MovieName == "Black Adam")
+            {
+                FilmTitles.Remove("Black Adam");
+            }
+            else if (MovieName == "Jurassic World")
+            {
+                FilmTitles.Remove("Jurassic World");
+            }
         }
     }
 }
